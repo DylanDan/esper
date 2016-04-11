@@ -1,0 +1,29 @@
+module com.dylan.esper.module;
+
+import com.dylan.esper.bo.*;
+//======================================================================================
+//create window order_1.win:time(3 sec) as TradeOrder;
+
+//create window order_2.win:keepall() as order_1 insert where orderId = '2';
+
+//select * from order_1;
+
+//@Name("order_2")
+//select * from order_2;
+//=======================================================================================
+
+create window OrdersWindow_1.win:time(5) as TradeOrder;
+insert into OrdersWindow_1 select * from TradeOrder;
+
+create window OrdersWindow.win:keepall() as TradeOrder;
+insert into OrdersWindow select * from TradeOrder;
+
+//on TradeOrder as spe merge OrdersWindow as win
+//where win.orderId = spe.orderId 
+//when not matched then insert select *
+//when matched then update set win.price = spe.price
+
+
+
+
+
