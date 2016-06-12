@@ -5,6 +5,13 @@ import java.util.List;
 
 public class TradeOrder implements Serializable{
 	
+	@Override
+	public String toString() {
+		return "TradeOrder [size=" + size + ", userId=" + userId + ", orderId="
+				+ orderId + ", price=" + price + ", bid=" + bid + ", offer="
+				+ offer + "]";
+	}
+
 	/**
 	 * 
 	 */
@@ -12,6 +19,16 @@ public class TradeOrder implements Serializable{
 
 	private int size;
 	
+	private String userId;
+	
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+
 	private String orderId;
 	
 	private double price;

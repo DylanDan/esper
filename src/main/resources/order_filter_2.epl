@@ -1,0 +1,101 @@
+module com.dylan.esper.order.module;
+
+import com.dylan.esper.bo.*;
+
+create window userSessionWin.win:keepall() as UserSession;
+insert into userSessionWin select * from UserSession;
+create window exchStatusWin.win:keepall() as ExchStatus;
+insert into exchStatusWin select * from ExchStatus;
+
+create window cashWin.win:keepall() as CashEvent;
+create window securityWin.win:keepall() as SecurityEvent;
+create window OrdersLockCashWin.win.keepall() as OrdersLockCashEvent;
+create window OrdersLockSecurityWin.win.keepall() as OrdersLockSecurityEvent;
+//create window orderWin.win:keepall() as OrderEvent;
+//@Name("Order")
+//insert into orderWin select * from OrderEvent;
+create window OrdersCheckWin.win:keepall() as OrderExchCheckEvent;
+create window OrdersFailedWin.win:keepall() as OrderCheckFailEvent;
+create window OrdersBuyWin.win:keepall() as OrderBuyEvent;
+create window OrdersBuyWin.win:keepall() as OrderBuyEvent;
+create window LHWin.win:keepall() as LHOrderEvent;
+
+@Name("LHStream")
+select * from LHWin;
+
+@Name("OrderCheckFailStream")
+select * from OrdersFailedWindow;
+
+on OrderEvent as cepOrder merge userSessionWin as cepUserSession
+where cepOrder.userId = cepUserSession.userId
+when matched and cepUserSession.loginStatus = "1"
+     then insert into  OrdersCheckWindow select *
+     then delete
+when matched and cepUserSession.loginStatus = "2"
+     then insert into  OrdersFailedWindow select *
+     then delete
+when not matched 
+     then insert into  OrdersFailedWindow select *;
+     
+on OrderExchCheckEvent as cepOrder  merge exchStatusWin as cepExch
+where  cepOrder.exch = cepExch.exch and cepExch.cepExch = "OPEN"
+when   matched and cepOrder.side="BUY"
+       then insert into  OrdersBuyWindow select *
+       then delete
+when   matched and cepOrder.side="SELL"
+       then insert into  OrdersSellWindow select *
+       then delete       
+when   not matched 
+       then insert into  OrdersFailedWindow select *;
+       
+on OrderBuyEvent as cepOrder merge cashWin as cepCash
+where  cepOrder.userid = cepCash.userid //and cash condition
+when   matched
+       then insert into  OrdersLockCashWin select *
+when   not matched
+       then insert into  OrdersFailedWindow select *;
+
+on OrderSellEvent as cepOrder merge securityWin as cepSecurity
+where  cepOrder.userid = cepCash.userid //and security condition
+when   matched
+       then insert into  OrdersLockSecurityWin select *
+when   not matched
+       then insert into  OrdersFailedWindow select *;
+       
+on OrdersLockCashEvent as cepOrder merge cashWin as cepCash
+where  cepOrder.userId = cepCash。userId
+when   matched 
+       then update set //lock cash
+       insert into  LHWin select *
+       
+on OrdersLockSecurityEvent as cepOrder merge securityWin as cepSucurity
+where  cepOrder.userId = cepCash。userId
+when   matched 
+       then update set //lock Sucurity
+       then insert into  LHWin select * 
+
+on OrderCheckFailEvent merge OrdersFailedWindow
+when matched 
+     then delete
+     
+on LHOrderEvent merge LHWin
+when matched 
+     then delete
+   
+
+
+
+
+     
+
+ 
+
+ 
+ 
+    
+
+
+
+
+
+

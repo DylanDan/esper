@@ -1,0 +1,71 @@
+module com.dylan.esper.order.module;
+
+import com.dylan.esper.bo.*;
+
+//======================================================================================
+//create window orderWin.win:keepall() as TradeOrder;
+
+//create window order_2.win:keepall() as order_1 insert where orderId = '2';
+
+//select * from order_1;
+
+//@Name("order_2")
+//select * from order_2;
+//=======================================================================================
+
+create window OrdersWindow_1.win:time(5) as TradeOrder;
+insert into OrdersWindow_1 select * from TradeOrder;
+
+//create window OrdersWindow.win:keepall() as TradeOrder;
+//insert into OrdersWindow select * from TradeOrder;
+
+//on TradeOrder as spe merge OrdersWindow as win
+//where win.orderId = spe.orderId 
+//when not matched then insert select *
+//when matched then update set win.price = spe.price
+
+create window cashWin:keepall() as UserSession;
+
+create window userSessionWin.win:keepall() as UserSession;
+insert into userSessionWin select * from UserSession;
+create window exchStatusWin.win:keepall() as ExchStatus;
+insert into exchStatusWin select * from ExchStatus;
+create window OrdersCheckWindow.win:keepall() as OrderExchCheckEvent;
+insert into OrdersCheckWindow select * from OrderExchCheckEvent;
+create window OrdersFailedWindow.win:keepall() as OrderCheckFailEvent;
+insert into OrdersFailedWindow select * from OrderCheckFailEvent;
+create window OrdersBuyWindow.win:keepall() as OrderBuyEvent;
+insert into OrdersBuyWindow select * from OrderBuyEvent;
+create window OrdersSellWindow.win:keepall() as OrderSellEvent;
+insert into OrdersSellWindow select * from OrderSellEvent;
+
+
+insert into  OrdersCheckWindow  select cepOrder.*  from OrdersWindow_1 as cepOrder,userSessionWin as cepSession where cepOrder.userId = cepSession.userId and cepSession.loginStatus = '1';
+insert into  OrdersFailedWindow select cepOrder.*  from OrdersWindow_1 as cepOrder,userSessionWin as cepSession where cepOrder.userId = cepSession.userId and cepSession.loginStatus = '2';
+
+insert into OrdersBuyWindow select cepOrder.*  from OrdersCheckWindow as cepOrder,exchStatusWin as cepExch where cepOrder.exch = exchStatusWin.exch and cepOrder.side='BUY' and exchStatusWin.EPMarketChannelStatus = 'OPEN';
+insert into OrdersSellWindow select cepOrder.*  from OrdersCheckWindow as cepOrder,exchStatusWin as cepExch where cepOrder.exch = exchStatusWin.exch and cepOrder.side='SELL' and exchStatusWin.EPMarketChannelStatus = 'OPEN';
+insert into OrdersFailedWindow select cepOrder.*  from OrdersCheckWindow as cepOrder,exchStatusWin as cepExch where cepOrder.exch = exchStatusWin.exch and cepOrder.side and exchStatusWin.EPMarketChannelStatus != 'OPEN';
+
+on OrderBuyEvent as cepOrder merge cashWin as cash 
+where cepOrder.userid = cash.userid
+when matched and cepOrder.rqt + cash.rqt < 10000
+     then ......
+when mathch and cepOrder.rqt + cash.rqt > 10000
+     then .....
+when not matched
+     then .....
+
+     
+
+ 
+
+ 
+ 
+    
+
+
+
+
+
+

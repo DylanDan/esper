@@ -12,8 +12,8 @@ import com.dylan.esper.bo.*;
 //select * from order_2;
 //=======================================================================================
 
-create window OrdersWindow_1.win:time(5) as TradeOrder;
-insert into OrdersWindow_1 select * from TradeOrder;
+//create window OrdersWindow_1.win:time(5) as TradeOrder;
+//insert into OrdersWindow_1 select * from TradeOrder;
 
 create window OrdersWindow.win:keepall() as TradeOrder;
 insert into OrdersWindow select * from TradeOrder;
