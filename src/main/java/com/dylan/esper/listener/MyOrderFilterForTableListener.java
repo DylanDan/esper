@@ -5,12 +5,13 @@ import java.util.Date;
 import com.dylan.esper.bo.TradeOrder;
 import com.espertech.esper.client.EventBean;
 import com.espertech.esper.client.UpdateListener;
+import com.espertech.esper.event.arr.ObjectArrayEventBean;
 
-public class MyOrderFilterListener implements UpdateListener {
+public class MyOrderFilterForTableListener implements UpdateListener {
 	
 	private String prefix; 
 	
-	public MyOrderFilterListener(String prefix){
+	public MyOrderFilterForTableListener(String prefix){
 		
 		this.prefix = prefix;
 	}
@@ -20,9 +21,8 @@ public class MyOrderFilterListener implements UpdateListener {
     	if(null != newEvents){
     		System.out.println(prefix+ " new start=========================================");
     		for(EventBean event : newEvents){
-//    		System.out.println(new Date()+"===="+(((TradeOrder)event.getUnderlying()).getOrderId()+"--"+((TradeOrder)event.getUnderlying()).getSize()+"--"+((TradeOrder)event.getUnderlying()).getPrice()));
-    		System.out.println(new Date()+"===="+event.get("id")+"--"+event.get("size")+"--"+event.get("price"));
-    		}
+    			ObjectArrayEventBean bean = (ObjectArrayEventBean)event;
+    			System.out.println(bean.getProperties()[0]+"==="+bean.getProperties()[1]+"===="+bean.getProperties()[2]);    		}
     		System.out.println(prefix + " new end===========================================");
     	}
     	if(null != oldEvents){

@@ -6,11 +6,11 @@ import com.dylan.esper.bo.TradeOrder;
 import com.espertech.esper.client.EventBean;
 import com.espertech.esper.client.UpdateListener;
 
-public class MyOrderFilterListener implements UpdateListener {
+public class MyErrorFilterListener implements UpdateListener {
 	
 	private String prefix; 
 	
-	public MyOrderFilterListener(String prefix){
+	public MyErrorFilterListener(String prefix){
 		
 		this.prefix = prefix;
 	}
@@ -20,14 +20,9 @@ public class MyOrderFilterListener implements UpdateListener {
     	if(null != newEvents){
     		System.out.println(prefix+ " new start=========================================");
     		for(EventBean event : newEvents){
-//    		System.out.println(new Date()+"===="+(((TradeOrder)event.getUnderlying()).getOrderId()+"--"+((TradeOrder)event.getUnderlying()).getSize()+"--"+((TradeOrder)event.getUnderlying()).getPrice()));
-    		System.out.println(new Date()+"===="+event.get("id")+"--"+event.get("size")+"--"+event.get("price"));
+    		System.out.println(new Date()+"===="+event.get("id")+"--"+event.get("res")+"--"+event.get("errorCode"));
     		}
     		System.out.println(prefix + " new end===========================================");
-    	}
-    	if(null != oldEvents){
-    		EventBean event = oldEvents[0];
-    		System.out.println(new Date()+"xxxxxxxxxx"+event.get("orderId")+"xxxxxxxxxx"+event.get("price"));
     	}
     }
 }

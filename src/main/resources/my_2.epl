@@ -1,0 +1,39 @@
+module com.dylan.esper.module;
+
+import com.dylan.esper.bo.*;
+
+create schema OrderExchCheckStream1 as(id string,size int, price double);
+create schema OrderExchCheckStream2 as(id string,size int, price double);
+create schema ErrorStream as(id string,res string,errorCode string);
+
+
+       
+create window Order_win_1.win:keepall() as OrderExchCheckStream1;
+
+create window Order_win_2.win:keepall() as OrderExchCheckStream2;
+
+//then insert into OrderExchCheckStream4 select input.userId as id ,input.size as size ,input.price as price where input.size > 50
+On TradeOrder 
+    //insert into Order_win_1 select orderId as id,price,size where size > 50
+    insert into OrderExchCheckStream1 select orderId as id,price,size where size > 10
+    //insert into OrderExchCheckStream2 select orderId as id,price,size;
+    insert into ErrorStream select orderId as id,'FAIL' as res ,'1111' as errorCode;
+    
+On OrderExchCheckStream1
+   insert into OrderExchCheckStream2 select * where price > 0.2
+   insert into ErrorStream select id,'FAIL' as res ,'1111' as errorCode;
+   
+On OrderExchCheckStream2
+   insert into OrderExchCheckStream3 select * where id = '3'
+   insert into ErrorStream select id,'FAIL' as res ,'1111' as errorCode;
+
+@Name("onOk")     
+//select * from Order_win_1;
+select * from OrderExchCheckStream3;
+
+@Name("ErrorStream")     
+select * from ErrorStream;
+     
+
+
+

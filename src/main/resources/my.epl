@@ -1,0 +1,32 @@
+module com.dylan.esper.module;
+
+import com.dylan.esper.bo.*;
+
+create schema OrderExchCheckStream(id string,size int, price double);
+
+//create table OrderTable(
+//       id string primary key,
+//       size int,
+//       price double
+//       );
+       
+create window OrderExchCheckStreamWin.win:keepall() as OrderExchCheckStream; 
+
+//insert into OrderExchCheckStream select userId as id,price,size from TradeOrder where price > 0.5 ;
+
+//@Name("koOrder")
+//select * from OrderExchCheckStream where size > 100;
+
+
+On TradeOrder  input 
+merge OrderExchCheckStreamWin  hold
+where input.userId = hold.id
+when matched
+     then update set size = size+input.size, price = price + input.price 
+when not matched 
+     then insert select userId as id,size,price; 
+     
+@Name("ontable")
+select * from OrderExchCheckStreamWin;
+
+

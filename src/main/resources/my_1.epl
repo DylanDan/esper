@@ -1,0 +1,55 @@
+module com.dylan.esper.module;
+
+import com.dylan.esper.bo.*;
+
+create schema OrderExchCheckStream1 as(id string,size int, price double);
+create schema OrderExchCheckStream2 as(id string,size int, price double);
+
+
+       
+create window Order_win_1.win:keepall() as OrderExchCheckStream1;
+
+create window Order_win_2.win:keepall() as OrderExchCheckStream2;
+
+//insert into OrderExchCheckStream select userId as id,price,size from TradeOrder where price > 0.5 ;
+
+//on OrderExchCheckStream select *; 
+
+//@Name("onOk") 
+//On TradeOrder
+//   insert into OrderExchCheckStream1 select userId as id,price,size where price > 0.5;
+
+
+//On TradeOrder(price > 0.5) 
+//   insert into Order_win_1 select userId as id,price,size;
+    
+//On OrderExchCheckStream1
+//   insert into OrderExchCheckStream2 select id,price,size where size > 50;
+
+//@Name("onOk")
+//select irstream * from OrderExchCheckStream2;
+
+On TradeOrder as input 
+merge Order_win_1 as hold
+where input.size > 50
+when matched and
+then insert into OrderExchCheckStream4 select input.userId as id ,input.size as size ,input.price as price
+then insert select input.userId as id ,input.size as size ,input.price as price
+when not matched
+then insert into OrderExchCheckStream5 select input.userId as id ,input.size as size,input.price as price;
+
+     
+      
+     
+//On OrderExchCheckStream1  input 
+//merge Order_win_2  hold
+//where input.price > 0.5
+//when matched   
+//     then insert select id,size,price;
+
+@Name("onOk")     
+select * from OrderExchCheckStream1;
+     
+
+
+
