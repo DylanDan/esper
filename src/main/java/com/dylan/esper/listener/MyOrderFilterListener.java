@@ -20,8 +20,8 @@ public class MyOrderFilterListener implements UpdateListener {
     	if(null != newEvents){
     		System.out.println(prefix+ " new start=========================================");
     		for(EventBean event : newEvents){
-//    		System.out.println(new Date()+"===="+(((TradeOrder)event.getUnderlying()).getOrderId()+"--"+((TradeOrder)event.getUnderlying()).getSize()+"--"+((TradeOrder)event.getUnderlying()).getPrice()));
-    		System.out.println(new Date()+"===="+event.get("id")+"--"+event.get("size")+"--"+event.get("price"));
+    		System.out.println(new Date()+"===="+(((TradeOrder)event.getUnderlying()).getOrderId()+"--"+((TradeOrder)event.getUnderlying()).getSize()+"--"+((TradeOrder)event.getUnderlying()).getPrice()));
+//    			System.out.println(new Date()+"===="+event.get("id")+"--"+event.get("              ")+"--"+event.get("price"));
     		}
     		System.out.println(prefix + " new end===========================================");
     	}

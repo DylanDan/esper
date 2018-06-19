@@ -47,16 +47,16 @@ public class CEPEngine {
 		
 		EPDeploymentAdmin deployAdm = adm.getDeploymentAdmin();
 		
-		Module  module = deployAdm.read("my_2.epl");
+		Module  module = deployAdm.read("my_3.epl");
 		
 		DeploymentResult deployResult = deployAdm.deploy(module, new DeploymentOptions());
 		
 //		adm.getStatement("OrderExchCheckStream").addListener(new MyOrderFilterListener("OrderExchCheckStream"));
 //		adm.getStatement("OrderCheckFailStream").addListener(new MyOrderFilterListener("OrderCheckFailStream"));
 //		adm.getStatement("koOrder").addListener(new MyOrderFilterListener("koOrder"));
-		adm.getStatement("onOk").addListener(new MyOrderFilterListener("onOk"));
+//		adm.getStatement("onOk").addListener(new MyOrderFilterListener("onOk"));
 //		adm.getStatement("ErrorStream").addListener(new MyErrorFilterListener("ErrorStream"));
-//		adm.getStatement("Order").addListener(new MyOrderFilterListener("Order"));
+		adm.getStatement("Order").addListener(new MyOrderFilterListener("Order"));
 		
 	}
 	
@@ -128,7 +128,13 @@ public class CEPEngine {
 		for(int i =0 ;i<10;i++){
 			TradeOrder order = new TradeOrder();
 			order.setUserId("dx0001");
-			order.setOrderId(ids[rd.nextInt(4)]);
+			int num = rd.nextInt(4);
+			if(num == 2) {
+				order.setOrderId(ids[num]);
+			}
+			if(num == 3) {
+				order.setOrderId("");
+			}
 			order.setSize(rd.nextInt(100)+10);
 			order.setPrice(rd.nextDouble());
 			
@@ -138,7 +144,7 @@ public class CEPEngine {
 			List<Quotes> bids = new ArrayList<Quotes>();
 			bids.add(bid);
 			order.setBid(bids);
-			System.out.println(new Date()+"<++++++++"+order.getOrderId()+"======"+order.getPrice()+"==="+order.getSize());
+			System.out.println(new Date()+"<++++++++num="+num+"==="+order.getOrderId()+"======"+order.getPrice()+"==="+order.getSize());
 			CEPEngine.sendMsg(order);
 			try {
 				Thread.sleep(1000);
@@ -148,20 +154,20 @@ public class CEPEngine {
 			}
 		}
 		
-		System.out.println("=============================================================");
-		EPOnDemandQueryResult  result_1 = EPServiceProviderManager.getDefaultProvider().getEPRuntime().executeQuery("select * from Order_win_1");
-		Iterator<EventBean>  itor_1 = result_1.iterator();
-		while(itor_1.hasNext()){
-			System.out.println(((TradeOrder)itor_1.next().getUnderlying()).toString());
-		}
-		
-		System.out.println("=============================================================");
-		EPOnDemandQueryResult  result_2 = EPServiceProviderManager.getDefaultProvider().getEPRuntime().executeQuery("select * from Order_win_2");
-		Iterator<EventBean>  itor_2 = result_2.iterator();
-		while(itor_2.hasNext()){
-			System.out.println(((TradeOrder)itor_2.next().getUnderlying()).toString());
-		}
-		System.out.println("=============================================================");
+//		System.out.println("=============================================================");
+//		EPOnDemandQueryResult  result_1 = EPServiceProviderManager.getDefaultProvider().getEPRuntime().executeQuery("select * from Order_win_1");
+//		Iterator<EventBean>  itor_1 = result_1.iterator();
+//		while(itor_1.hasNext()){
+//			System.out.println(((TradeOrder)itor_1.next().getUnderlying()).toString());
+//		}
+//		
+//		System.out.println("=============================================================");
+//		EPOnDemandQueryResult  result_2 = EPServiceProviderManager.getDefaultProvider().getEPRuntime().executeQuery("select * from Order_win_2");
+//		Iterator<EventBean>  itor_2 = result_2.iterator();
+//		while(itor_2.hasNext()){
+//			System.out.println(((TradeOrder)itor_2.next().getUnderlying()).toString());
+//		}
+//		System.out.println("=============================================================");
 		
 //		EPAdministrator  adm = EPServiceProviderManager.getDefaultProvider().getEPAdministrator();
 //		EPOnDemandQueryResult  result = EPServiceProviderManager.getDefaultProvider().getEPRuntime().executeQuery("select * from OrderTable");

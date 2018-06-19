@@ -1,0 +1,10 @@
+module com.dylan.esper.module;
+import com.dylan.esper.bo.*;
+
+@Name("Order")
+select * from TradeOrder where orderId is null or orderId = "";
+
+
+
+
+
